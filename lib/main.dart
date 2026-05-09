@@ -35,6 +35,9 @@ class _BluetoothScanPageState extends State<BluetoothScanPage> {
   String estado = "Presiona el botón para buscar el ESP32";
   List<ScanResult> dispositivosEncontrados = [];
 
+  String bpm = "--";
+  String spo2 = "--";
+
   Future<void> pedirPermisos() async {
     await Permission.bluetoothScan.request();
     await Permission.bluetoothConnect.request();
@@ -106,14 +109,18 @@ class _BluetoothScanPageState extends State<BluetoothScanPage> {
               List<String> partes = data.split(",");
 
               if (partes.length == 2) {
-                String bpm = partes[0];
-                String spo2 = partes[1];
+                String bpmRecibido = partes[0];
+                String spo2Recibido = partes[1];
 
-                print("BPM: $bpm");
-                print("SpO2: $spo2");
+                print("BPM: $bpmRecibido");
+                print("SpO2: $spo2Recibido");
 
                 setState(() {
-                  estado = "BPM: $bpm | SpO2: $spo2%";
+                  bpm= bpmRecibido;
+                  spo2 = spo2Recibido;
+
+    
+                  estado = "Datos recibidos correctamente";
                 });
               }
             });
@@ -126,16 +133,134 @@ class _BluetoothScanPageState extends State<BluetoothScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        title: const Text("Escaneo BLE ESP32"),
+        title: const Text("Monitor BLE ESP32", 
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20,  
+        )
       ),
-      body: Padding(
+      centerTitle: true,
+      backgroundColor: const Color(0xFF4F6BFF),
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
+    body: Padding(
+
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Text(
-              estado,
-              style: const TextStyle(fontSize: 18),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAF0FF),
+                borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.bluetooth,
+                  color: Color(0xFF4F6BFF),
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    estado,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3748),
+                    ),
+                  ),
+                ),  
+              ]
+            ),
+            ),
+            const SizedBox(height: 20),
+
+
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 14,
+                    offset: const Offset(0, 8),
+                  ),
+                  ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.favorite,
+                        color:Color(0xFFFF4F6D),
+                         size:30,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "BPM",
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        bpm,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFF4F6D),
+                        ),
+                      ),
+                      ]
+                  ),
+
+                  Container(
+                    height: 70,
+                    width: 1,
+                    color: Colors.grey.shade300,
+                  ),
+
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.air,
+                        color: Color(0xFF20C997),
+                        size: 30,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "SpO₂",
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "$spo2%",
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF20C997)
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),
